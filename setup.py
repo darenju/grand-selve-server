@@ -14,6 +14,7 @@ requires = (
 setup(
   name="grand_selve",
   version="1.0",
+  install_requires=requires,
   author="Julien Fradin",
   author_email="julien@frad.in",
   description=("L'application serveur pour la paroisse Grand Selve"),
