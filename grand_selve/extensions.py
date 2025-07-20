@@ -7,7 +7,6 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 def parse_date(s):
-    print(s)
     if s == "":
         return None
 

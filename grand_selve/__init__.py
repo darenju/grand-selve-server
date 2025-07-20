@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from .extensions import db, migrate
 from .models import *
@@ -13,7 +13,6 @@ from .auth import login_required
 def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = 'cjewijfie2f828fnm'
-  # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
   app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://grand_selve:jesus@localhost:5432/grand_selve"
   app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 900        # 15 minutes
   app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 604800     # 7 jours
@@ -30,9 +29,4 @@ def create_app():
   app.register_blueprint(user_bp)
   app.register_blueprint(member_bp)
   
-  @app.route('/lol', methods=['GET'])
-  @login_required
-  def lol():
-    return jsonify({ 'message': 'It works!' })
-
   return app

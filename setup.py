@@ -19,4 +19,5 @@ setup(
   author_email="julien@frad.in",
   description=("L'application serveur pour la paroisse Grand Selve"),
   packages=find_packages(include=["grand_selve", "grand_selve.*"]),
+  include_package_data=True,
 )
