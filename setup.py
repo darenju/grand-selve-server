@@ -4,7 +4,7 @@ requires = (
   "psycopg2-binary",
   "flask",
   "flask_cors",
-  "flask_sqlalchemy",
+  "Flask-SQLAlchemy",
   "sqlalchemy",
   "Flask-Migrate",
   "werkzeug",
