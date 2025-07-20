@@ -1,17 +1,20 @@
 from setuptools import setup
 
 requires = (
-  "fpdf2",
-  "python-barcode",
-  "qrcode",
+  "psycopg2-binary",
   "flask",
   "flask_cors",
+  "flask_sqlalchemy",
+  "sqlalchemy",
+  "Flask-Migrate",
+  "werkzeug",
+  "PyJWT",
 )
 
 setup(
-  name="kompakt_fidelity",
+  name="grand_selve",
   version="1.0",
   author="Julien Fradin",
   author_email="julien@frad.in",
-  description=("Generate a PDF of fidelity cards for the Mudita Kompakt"),
+  description=("L'application serveur pour la paroisse Grand Selve"),
 )
