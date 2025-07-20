@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 requires = (
   "psycopg2-binary",
@@ -17,4 +17,5 @@ setup(
   author="Julien Fradin",
   author_email="julien@frad.in",
   description=("L'application serveur pour la paroisse Grand Selve"),
+  packages=["grand_selve"],
 )
