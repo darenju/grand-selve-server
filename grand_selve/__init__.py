@@ -12,7 +12,7 @@ from .routes.user import user_bp
 from .auth import login_required
 
 def create_app():
-  env = os.getenv('FLASK_ENV', 'production').lower()
+  env = os.getenv('FLASK_ENV', 'development').lower()
   is_production = env == 'production'
 
   app = Flask(__name__)
