@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from .extensions import db, migrate
@@ -11,6 +12,9 @@ from .routes.user import user_bp
 from .auth import login_required
 
 def create_app():
+  env = os.getenv('FLASK_ENV', 'production').lower()
+  is_production = env == 'production'
+
   app = Flask(__name__)
   app.config['SECRET_KEY'] = 'cjewijfie2f828fnm'
   app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://grand_selve:jesus@localhost:5432/grand_selve"
@@ -20,7 +24,11 @@ def create_app():
   CORS(app)
 
   db.init_app(app)
-  migrate.init_app(app, db)
+
+  if is_production:
+    migrate.init_app(app, db, directory=os.path.join(os.path.dirname(__file__), '../migrations'))
+  else:
+    migrate.init_app(app, db)
 
   app.register_blueprint(auth_bp)
   app.register_blueprint(home_bp)
