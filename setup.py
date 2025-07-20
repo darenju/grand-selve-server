@@ -18,5 +18,5 @@ setup(
   author="Julien Fradin",
   author_email="julien@frad.in",
   description=("L'application serveur pour la paroisse Grand Selve"),
-  packages=["grand_selve"],
+  packages=find_packages(include=["grand_selve", "grand_selve.*"]),
 )
