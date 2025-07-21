@@ -9,6 +9,7 @@ requires = (
   "Flask-Migrate",
   "werkzeug",
   "PyJWT",
+  "waitress",
 )
 
 setup(

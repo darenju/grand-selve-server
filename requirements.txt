@@ -6,3 +6,4 @@ sqlalchemy
 Flask-Migrate
 werkzeug
 PyJWT
+waitress
