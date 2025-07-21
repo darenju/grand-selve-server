@@ -28,7 +28,7 @@ def create_app():
   app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 604800     # 7 jours
   app.config["CACHE_TYPE"] = os.getenv("CACHE_TYPE")
   app.config["CACHE_DEFAULT_TIMEOUT"] = 300 # 5 minutes
-  
+
   CORS(app)
 
   db.init_app(app)

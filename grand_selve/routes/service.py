@@ -3,11 +3,12 @@ from ..auth import login_required
 from ..models.service import Service, filter_services
 from ..models.user_service_role import ServiceRoleEnum, UserServiceRole
 from ..models.forum_message import ForumMessage
-from ..extensions import db
+from ..extensions import db, auto_cache, invalidate_cache
 
 service_bp = Blueprint('service', __name__, url_prefix='/service')
 
 @service_bp.route('', methods=['GET'])
+@auto_cache()
 @login_required
 def get_services():
   filters = request.args
@@ -18,6 +19,7 @@ def get_services():
 
 
 @service_bp.route('/<service_id>', methods=['GET'])
+@auto_cache()
 @login_required
 def get_service(service_id):
   service = db.session.get(Service, int(service_id))
@@ -29,6 +31,7 @@ def get_service(service_id):
 
 
 @service_bp.route('/<service_id>/details', methods=['GET'])
+@auto_cache()
 @login_required
 def get_service_details(service_id):
   service = db.session.get(Service, int(service_id))
@@ -53,6 +56,8 @@ def create_service():
   db.session.add(service)
   db.session.commit()
 
+  invalidate_cache(["get_services"])
+
   return jsonify(service.to_dict()), 201
 
 
@@ -67,6 +72,8 @@ def edit_service(service_id):
   service.color = data.get("color")
 
   db.session.commit()
+
+  invalidate_cache(["get_services", f"get_service|service_id={service_id}", f"get_service_details|service_id={service_id}"])
 
   return jsonify(service.to_dict())
 
@@ -121,6 +128,15 @@ def delete_user_link(link_id):
   return jsonify({ "message": "OK" })
 
 
+@service_bp.route("/<service_id>/forum", methods=["GET"])
+@auto_cache()
+@login_required
+def get_forum(service_id):
+  forum_messages = db.session.query(ForumMessage).filter(ForumMessage.service_id == int(service_id)).all()
+
+  return jsonify([fm.to_dict() for fm in forum_messages])
+
+
 @service_bp.route("/<service_id>/forum", methods=["POST"])
 @login_required
 def post_forum_message(service_id):
@@ -140,12 +156,6 @@ def post_forum_message(service_id):
   db.session.add(forum_message)
   db.session.commit()
 
+  invalidate_cache([f"get_forum|service_id={service_id}"])
+
   return jsonify({ "message": "Message posté." }), 201
-
-
-@service_bp.route("/<service_id>/forum", methods=["GET"])
-@login_required
-def get_forum(service_id):
-  forum_messages = db.session.query(ForumMessage).filter(ForumMessage.service_id == int(service_id)).all()
-
-  return jsonify([fm.to_dict() for fm in forum_messages])

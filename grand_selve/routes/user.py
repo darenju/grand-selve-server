@@ -3,12 +3,12 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash
 from ..auth import login_required
 from ..models.user import User, filter_users
-from ..extensions import db, parse_date, cache
+from ..extensions import db, parse_date, auto_cache, invalidate_cache
 
 user_bp = Blueprint("user", __name__, url_prefix="/user")
 
 @user_bp.route("", methods=["GET"])
-@cache.cached(key_prefix="get_users")
+@auto_cache()
 @login_required
 def get_users():
   filters = request.args
@@ -19,7 +19,7 @@ def get_users():
 
 
 @user_bp.route("/<user_id>", methods=["GET"])
-@cache.cached(key_prefix=lambda: f"get_user_{request.view_args['user_id']}")
+@auto_cache()
 @login_required
 def get_user(user_id):
   user = db.session.get(User, int(user_id))
@@ -31,7 +31,7 @@ def get_user(user_id):
 
 
 @user_bp.route("/<user_id>/details", methods=["GET"])
-@cache.cached(key_prefix=lambda: f"get_user_details_{request.view_args['user_id']}")
+@auto_cache()
 @login_required
 def get_user_details(user_id):
   user = db.session.get(User, int(user_id))
@@ -71,7 +71,7 @@ def create_user():
   db.session.commit()
 
   # Invalidate cache.
-  cache.delete("get_users")
+  invalidate_cache(["get_users"])
 
   return jsonify(user.to_dict()), 201
 
@@ -112,8 +112,6 @@ def edit_user(user_id):
   db.session.commit()
   
   # Invalidate cache.
-  cache.delete("get_users")
-  cache.delete(f"get_user_{user_id}")
-  cache.delete(f"get_user_details_{user_id}")
+  invalidate_cache(["get_users", f"get_user|user_id={user_id}", f"get_user_details|user_id={user_id}"])
 
   return jsonify(user.to_dict())
