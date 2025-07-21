@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 from .extensions import db, migrate
@@ -11,6 +12,8 @@ from .routes.service import service_bp
 from .routes.user import user_bp
 from .auth import login_required
 
+load_dotenv()
+
 def create_app():
   env = os.getenv('FLASK_ENV', 'development').lower()
   is_production = env == 'production'
@@ -18,6 +21,7 @@ def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
   app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://grand_selve:{os.getenv("DATABASE_PASSWORD")}@localhost:5432/grand_selve"
+  app.config["UPLOAD_FOLDER"] = os.getenv("AVATAR_UPLOAD_FOLDER")
   app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 900        # 15 minutes
   app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 604800     # 7 jours
   

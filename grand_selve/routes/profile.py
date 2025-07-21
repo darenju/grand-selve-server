@@ -1,26 +1,76 @@
+import os
+from uuid import uuid4
 from flask import Blueprint, request, jsonify, current_app, g
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 import jwt
+from ..models import User
 from ..extensions import db
 from ..auth import login_required
 from .user import edit_user
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
-@profile_bp.route('', methods=['PUT'])
-@login_required
-def update_profile():
+def get_user_id():
   auth_header = request.headers.get('Authorization', None)
   token = auth_header.split()[1]
 
   try:
     payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
     user_id = payload.get('sub')
-
-    return edit_user(int(user_id))
-
+    return user_id
   except jwt.InvalidTokenError:
     return jsonify({ "message": "Invalid refresh token." }), 401
+
+
+@profile_bp.route('', methods=['PUT'])
+@login_required
+def update_profile():
+  user_id = get_user_id()
+
+  return edit_user(int(user_id))
+
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+
+def get_extension(filename):
+    return filename.rsplit('.', 1)[1].lower()
+
+def allowed_file(filename):
+  return '.' in filename and get_extension(filename) in ALLOWED_EXTENSIONS
+
+
+@profile_bp.route("/avatar", methods=["POST"])
+@login_required
+def upload_avatar():
+  user_id = get_user_id()
+  user = User.query.get(user_id)
+
+  file = request.files.get("avatar")
+
+  if file and allowed_file(file.filename):
+    filename = secure_filename(f"{uuid4().hex}.{get_extension(file.filename)}")
+    file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+
+    user.avatar_path = filename
+    db.session.commit()
+
+    return jsonify(user.to_dict())
+
+  return jsonify({ "message": "Impossible de changer d'avatar." }), 400
+
+
+@profile_bp.route("/avatar", methods=["DELETE"])
+@login_required
+def delete_avatar():
+  user_id = get_user_id()
+  user = User.query.get(user_id)
+
+  user.avatar_path = None
+  db.session.commit()
+
+  return jsonify(user.to_dict())
 
 @profile_bp.route("/change-password", methods=["POST"])
 @login_required

@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 requires = (
   "psycopg2-binary",
+  "python-dotenv",
   "flask",
   "flask_cors",
   "Flask-SQLAlchemy",

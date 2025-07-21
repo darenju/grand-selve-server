@@ -1,3 +1,4 @@
+import os
 from grand_selve import create_app
 from grand_selve.extensions import db
 from grand_selve.models.user import User
@@ -10,7 +11,7 @@ if __name__ == '__main__':
     if not User.query.filter_by(email="julien@frad.in").first():
       admin = User(
         email="julien@frad.in",
-        password_hash=generate_password_hash("w7H2gzyyhe"),
+        password_hash=generate_password_hash(os.getenv("ADMIN_PASSWORD")),
         first_name="Julien",
         last_name="Fradin",
         gender="male",

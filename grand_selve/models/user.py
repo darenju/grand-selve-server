@@ -6,6 +6,7 @@ class User(db.Model):
 
   id = db.Column(db.Integer, primary_key=True)
   email = db.Column(db.String(100), unique=True, nullable=False)
+  avatar_path = db.Column(db.String(300), nullable=True, default="")
   password_hash = db.Column(db.String(200), nullable=False)
   changed_first_password = db.Column(db.Boolean, nullable=False, default=False)
   first_name = db.Column(db.String(100), nullable=True, default="")
@@ -31,6 +32,7 @@ class User(db.Model):
     result = {
       "id": self.id,
       "email": self.email,
+      "avatar_path": self.avatar_path,
       "changed_first_password": self.changed_first_password,
       "first_name": self.first_name,
       "last_name": self.last_name,
