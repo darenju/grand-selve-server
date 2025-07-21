@@ -5,6 +5,7 @@ from flask_cors import CORS
 from .extensions import db, migrate
 from .models import *
 from .routes.auth import auth_bp
+from .routes.contact_card import contact_card_bp
 from .routes.home import home_bp
 from .routes.member import member_bp
 from .routes.profile import profile_bp
@@ -35,6 +36,7 @@ def create_app():
     migrate.init_app(app, db)
 
   app.register_blueprint(auth_bp)
+  app.register_blueprint(contact_card_bp)
   app.register_blueprint(home_bp)
   app.register_blueprint(profile_bp)
   app.register_blueprint(service_bp)
