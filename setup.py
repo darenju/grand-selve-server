@@ -11,6 +11,7 @@ requires = (
   "werkzeug",
   "PyJWT",
   "waitress",
+  "Flask-Caching",
 )
 
 setup(

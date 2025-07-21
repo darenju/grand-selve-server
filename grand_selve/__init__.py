@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
-from .extensions import db, migrate
+from flask_caching import Cache
+from .extensions import db, migrate, cache
 from .models import *
 from .routes.auth import auth_bp
 from .routes.contact_card import contact_card_bp
@@ -25,10 +26,13 @@ def create_app():
   app.config["UPLOAD_FOLDER"] = os.getenv("AVATAR_UPLOAD_FOLDER")
   app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 900        # 15 minutes
   app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 604800     # 7 jours
+  app.config["CACHE_TYPE"] = os.getenv("CACHE_TYPE")
+  app.config["CACHE_DEFAULT_TIMEOUT"] = 300 # 5 minutes
   
   CORS(app)
 
   db.init_app(app)
+  cache.init_app(app)
 
   if is_production:
     migrate.init_app(app, db, directory=os.path.join(os.path.dirname(__file__), '../migrations'))
