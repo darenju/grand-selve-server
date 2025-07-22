@@ -28,6 +28,9 @@ def create_app():
   app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 604800     # 7 jours
   app.config["CACHE_TYPE"] = os.getenv("CACHE_TYPE")
   app.config["CACHE_DEFAULT_TIMEOUT"] = 300 # 5 minutes
+  app.config["CACHE_REDIS_HOST"] = os.getenv("CACHE_REDIS_HOST")
+  app.config["CACHE_REDIS_PORT"] = os.getenv("CACHE_REDIS_PORT")
+  app.config["CACHE_REDIS_PASSWORD"] = os.getenv("CACHE_REDIS_PASSWORD")
 
   CORS(app)
 

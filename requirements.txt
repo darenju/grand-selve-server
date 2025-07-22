@@ -9,3 +9,4 @@ werkzeug
 PyJWT
 waitress
 Flask-Caching
+redis

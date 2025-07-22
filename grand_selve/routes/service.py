@@ -92,6 +92,8 @@ def attach_user_to_service(service_id, user_id):
   db.session.add(link)
   db.session.commit()
 
+  invalidate_cache([f"get_service|service_id={service_id}", f"get_service_details|service_id={service_id}"])
+
   return jsonify({ "message": "OK" })
 
 
@@ -111,6 +113,8 @@ def edit_user_link(link_id, service_id, user_id):
 
   db.session.commit()
 
+  invalidate_cache([f"get_service|service_id={service_id}", f"get_service_details|service_id={service_id}"])
+
   return jsonify({ "message": "OK" })
 
 
@@ -124,6 +128,8 @@ def delete_user_link(link_id):
 
   db.session.delete(link)
   db.session.commit()
+
+  invalidate_cache([f"get_service|service_id={link.service_id}", f"get_service_details|service_id={link.service_id}"])
 
   return jsonify({ "message": "OK" })
 

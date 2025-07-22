@@ -12,6 +12,7 @@ requires = (
   "PyJWT",
   "waitress",
   "Flask-Caching",
+  "redis",
 )
 
 setup(
