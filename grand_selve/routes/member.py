@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, g
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
+
+from .. import ContactCard
 from ..auth import login_required
 from ..models.member import Member, filter_members
 from ..models.service_membership import Membership
@@ -49,6 +51,7 @@ def get_member_details(member_id):
 @login_required()
 def create_member():
     data = request.get_json()
+    contact_card_id = data.get("from_contact_card")
 
     member = Member(
         email=data.get("email"),
@@ -58,14 +61,22 @@ def create_member():
         date_of_birth=parse_date(data.get("date_of_birth")),
 
         created_by_user_id=g.current_user.id,
-        # created_at=None,
         notes=data.get("notes"),
 
         telephone=data.get("telephone"),
         address=data.get("address"),
         zipcode=data.get("zipcode"),
         city=data.get("city"),
+
+        from_contact_card=contact_card_id,
     )
+
+    if contact_card_id:
+        contact_card = ContactCard.query.get(contact_card_id)
+
+        if contact_card:
+            contact_card.handled = datetime.now()
+            contact_card.handled_by_id = g.current_user.id
 
     db.session.add(member)
     db.session.commit()

@@ -9,7 +9,7 @@ class Member(db.Model):
     __tablename__ = 'members'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), nullable=False) # Not unique because might be used as parents' email.
+    email = db.Column(db.String(100), nullable=True, default="") # Not unique because might be used as parents' email.
     first_name = db.Column(db.String(100), nullable=True, default="")
     last_name = db.Column(db.String(100), nullable=True, default="")
     name = db.column_property(first_name + " " + last_name)
@@ -32,6 +32,7 @@ class Member(db.Model):
     marriage = db.Column(db.Date, nullable=True)
 
     memberships = db.relationship("Membership", back_populates="member")
+    from_contact_card = db.Column(db.Integer, db.ForeignKey("contact_card.id"), nullable=True)
 
     @hybrid_property
     def services(self):
