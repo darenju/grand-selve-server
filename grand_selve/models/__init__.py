@@ -1,4 +1,4 @@
-from .user import User
+from .user import UserRoleEnum, User
 from .service import Service
 from .user_service_role import UserServiceRole
 from .forum_message import ForumMessage

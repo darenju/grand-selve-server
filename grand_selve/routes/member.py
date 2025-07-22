@@ -10,7 +10,7 @@ member_bp = Blueprint("member", __name__, url_prefix="/member")
 
 
 @member_bp.route("", methods=["GET"])
-@login_required
+@login_required()
 def get_members():
     filters = request.args or {}
 
@@ -25,7 +25,7 @@ def get_members():
 
 
 @member_bp.route("/<member_id>", methods=["GET"])
-@login_required
+@login_required()
 def get_member(member_id):
     member = db.session.get(Member, int(member_id))
 
@@ -36,7 +36,7 @@ def get_member(member_id):
 
 
 @member_bp.route("/<member_id>/details", methods=["GET"])
-@login_required
+@login_required()
 def get_member_details(member_id):
     member = db.session.get(Member, int(member_id))
 
@@ -46,7 +46,7 @@ def get_member_details(member_id):
     return jsonify(member.to_dict(True))
 
 @member_bp.route("", methods=["POST"])
-@login_required
+@login_required()
 def create_member():
     data = request.get_json()
 
@@ -74,7 +74,7 @@ def create_member():
 
 
 @member_bp.route("/<member_id>", methods=["PUT"])
-@login_required
+@login_required()
 def edit_member(member_id):
     member = Member.query.get(member_id)
 
@@ -113,7 +113,7 @@ def edit_member(member_id):
 
 
 @member_bp.route("/<member_id>/service/<service_id>", methods=["POST"])
-@login_required
+@login_required()
 def attach_member_to_service(service_id, member_id):
   service_membership = Membership(
     member_id=int(member_id),
@@ -132,7 +132,7 @@ def attach_member_to_service(service_id, member_id):
 
 
 @member_bp.route("/<member_id>/service/<service_id>", methods=["DELETE"])
-@login_required
+@login_required()
 def delete_user_membership(service_id, member_id):
   membership = Membership.query.filter(
     Membership.service_id == int(service_id),
@@ -150,7 +150,7 @@ def delete_user_membership(service_id, member_id):
 
 
 @member_bp.route("/<member_id>/service/<service_id>/recreate", methods=["POST"])
-@login_required
+@login_required()
 def recreate_user_membership(service_id, member_id):
   membership = Membership.query.filter(
     Membership.service_id == int(service_id),

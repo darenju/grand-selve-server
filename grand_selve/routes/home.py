@@ -8,7 +8,7 @@ from ..auth import login_required
 home_bp = Blueprint('home', __name__, url_prefix='/')
 
 @home_bp.route('/stats', methods=['GET'])
-@login_required
+@login_required()
 def get_home_stats():
   users = db.session.query(func.count(User.id)).scalar()
   services = db.session.query(func.count(Service.id)).scalar()
@@ -19,7 +19,7 @@ def get_home_stats():
   })
 
 @home_bp.route('/search', methods=['GET'])
-@login_required
+@login_required()
 def search():
   query = request.args.get("query")
   services = filter_services({ "*": query })

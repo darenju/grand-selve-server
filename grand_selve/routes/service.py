@@ -9,7 +9,7 @@ service_bp = Blueprint('service', __name__, url_prefix='/service')
 
 @service_bp.route('', methods=['GET'])
 @auto_cache()
-@login_required
+@login_required()
 def get_services():
   filters = request.args
 
@@ -20,7 +20,7 @@ def get_services():
 
 @service_bp.route('/<service_id>', methods=['GET'])
 @auto_cache()
-@login_required
+@login_required()
 def get_service(service_id):
   service = db.session.get(Service, int(service_id))
   
@@ -32,7 +32,7 @@ def get_service(service_id):
 
 @service_bp.route('/<service_id>/details', methods=['GET'])
 @auto_cache()
-@login_required
+@login_required()
 def get_service_details(service_id):
   service = db.session.get(Service, int(service_id))
   
@@ -43,7 +43,7 @@ def get_service_details(service_id):
 
 
 @service_bp.route('', methods=['POST'])
-@login_required
+@login_required(admin=True)
 def create_service():
   data = request.get_json()
 
@@ -62,7 +62,7 @@ def create_service():
 
 
 @service_bp.route('/<service_id>', methods=['PUT'])
-@login_required
+@login_required(admin=True)
 def edit_service(service_id):
   data = request.get_json()
 
@@ -79,7 +79,7 @@ def edit_service(service_id):
 
 
 @service_bp.route("/<service_id>/user/<user_id>", methods=["POST"])
-@login_required
+@login_required(admin=True)
 def attach_user_to_service(service_id, user_id):
   data = request.get_json()
 
@@ -98,7 +98,7 @@ def attach_user_to_service(service_id, user_id):
 
 
 @service_bp.route("/link/<link_id>/<service_id>/user/<user_id>", methods=["PUT"])
-@login_required
+@login_required(admin=True)
 def edit_user_link(link_id, service_id, user_id):
   link = db.session.get(UserServiceRole, int(link_id))
   
@@ -119,7 +119,7 @@ def edit_user_link(link_id, service_id, user_id):
 
 
 @service_bp.route("/link/<link_id>", methods=["DELETE"])
-@login_required
+@login_required(admin=True)
 def delete_user_link(link_id):
   link = db.session.get(UserServiceRole, int(link_id))
 
@@ -136,7 +136,7 @@ def delete_user_link(link_id):
 
 @service_bp.route("/<service_id>/forum", methods=["GET"])
 @auto_cache()
-@login_required
+@login_required()
 def get_forum(service_id):
   forum_messages = db.session.query(ForumMessage).filter(ForumMessage.service_id == int(service_id)).all()
 
@@ -144,7 +144,7 @@ def get_forum(service_id):
 
 
 @service_bp.route("/<service_id>/forum", methods=["POST"])
-@login_required
+@login_required()
 def post_forum_message(service_id):
   data = request.get_json()
   user = g.current_user

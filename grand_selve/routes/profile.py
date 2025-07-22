@@ -24,7 +24,7 @@ def get_user_id():
 
 
 @profile_bp.route('', methods=['PUT'])
-@login_required
+@login_required()
 def update_profile():
   user_id = get_user_id()
 
@@ -42,7 +42,7 @@ def allowed_file(filename):
 
 
 @profile_bp.route("/avatar", methods=["POST"])
-@login_required
+@login_required()
 def upload_avatar():
   user_id = get_user_id()
   user = User.query.get(user_id)
@@ -62,7 +62,7 @@ def upload_avatar():
 
 
 @profile_bp.route("/avatar", methods=["DELETE"])
-@login_required
+@login_required()
 def delete_avatar():
   user_id = get_user_id()
   user = User.query.get(user_id)
@@ -73,7 +73,7 @@ def delete_avatar():
   return jsonify(user.to_dict())
 
 @profile_bp.route("/change-password", methods=["POST"])
-@login_required
+@login_required()
 def change_password():
   data = request.get_json()
 

@@ -33,8 +33,8 @@ def make_key(name, *args, **kwargs):
 
 def auto_cache():
     def decorator(fn):
-        @wraps(fn)
         @cache.cached(make_cache_key=lambda *args, **kwargs: make_key(fn. __name__))
+        @wraps(fn)
         def wrapped(*args, **kwargs):
             return fn(*args, **kwargs)
         return wrapped

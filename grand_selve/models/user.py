@@ -1,5 +1,12 @@
-from sqlalchemy import or_
+from sqlalchemy import or_, Enum as SQLAEnum
+from enum import Enum
 from ..extensions import db
+
+
+class UserRoleEnum(Enum):
+  ADMIN = "admin"
+  USER = "user"
+
 
 class User(db.Model):
   __tablename__ = 'users'
@@ -28,6 +35,8 @@ class User(db.Model):
   service_links = db.relationship("UserServiceRole", back_populates="user")
   forum_messages = db.relationship("ForumMessage", back_populates="user")
 
+  role = db.Column(SQLAEnum(UserRoleEnum), nullable=False)
+
   def to_dict(self, detailed=False):
     result = {
       "id": self.id,
@@ -50,6 +59,8 @@ class User(db.Model):
       "first_communion":  self.first_communion.strftime("%Y-%m-%d") if self.first_communion is not None else '',
       "marriage": self.marriage.strftime("%Y-%m-%d") if self.marriage is not None else '',
       "ordination": self.ordination.strftime("%Y-%m-%d") if self.ordination is not None else '',
+
+      "role": self.role.value,
     }
 
     if detailed:
