@@ -1,4 +1,5 @@
 from datetime import datetime
+from .member import Member
 from ..extensions import db
 
 class ContactCard(db.Model):
@@ -17,7 +18,7 @@ class ContactCard(db.Model):
   handled_by = db.relationship("User")
 
   def to_dict(self):
-    return {
+    result = {
       "id": self.id,
       "name": self.name,
       "email": self.email,
@@ -29,3 +30,10 @@ class ContactCard(db.Model):
       "handled_by_id": self.handled_by_id,
       "handled_by": self.handled_by.to_dict() if self.handled_by else None,
     }
+
+    if self.handled:
+      member = Member.query.filter_by(from_contact_card=self.id).first()
+      if member:
+        result["member_id"] = member.id
+
+    return result

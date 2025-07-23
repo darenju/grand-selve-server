@@ -36,7 +36,13 @@ def create_contact_card():
 @auto_cache()
 @login_required()
 def get_contact_cards():
-    contact_cards = ContactCard.query.filter_by(handled=None).all()
+    filters = []
+    if request.args.get("handled") == "null":
+        filters.append(ContactCard.handled.is_(None))
+    else:
+        filters.append(ContactCard.handled.is_not(None))
+
+    contact_cards = db.session.query(ContactCard).filter(*filters).all()
 
     return jsonify([cc.to_dict() for cc in contact_cards])
 
