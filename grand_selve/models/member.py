@@ -119,6 +119,4 @@ def filter_members(filters):
 
     order_by = getattr(order_by, filters.get("sort_direction"))()
 
-    return db.paginate(db.select(Member)
-                       .filter(or_(*or_filters), and_(*and_filters))
-                       .order_by(order_by))
+    return db.paginate(db.select(Member).filter(or_(*or_filters), and_(*and_filters)).order_by(order_by))

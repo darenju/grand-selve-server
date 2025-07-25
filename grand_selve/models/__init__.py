@@ -5,3 +5,4 @@ from .forum_message import ForumMessage
 from .member import Member
 from .service_membership import Membership
 from .contact_card import ContactCard
+from .private_message import PrivateMessage

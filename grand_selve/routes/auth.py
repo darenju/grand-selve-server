@@ -52,7 +52,7 @@ def refresh_token():
 
       return jsonify({
         'access_token': new_access_token,
-        'user': user.to_dict()
+        'user': user.to_dict(),
       }), 200
     else:
       return jsonify({ 'message': 'User not found' }), 404

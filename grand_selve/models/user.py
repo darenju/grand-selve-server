@@ -1,5 +1,7 @@
-from sqlalchemy import or_, Enum as SQLAEnum
+from sqlalchemy import or_, Enum as SQLAEnum, func
 from enum import Enum
+
+from .private_message import PrivateMessage
 from ..extensions import db
 
 
@@ -67,7 +69,11 @@ class User(db.Model):
       result["services"] = [s.to_dict_service() for s in self.service_links]
     
     return result
-  
+
+  def private_messages_count(self):
+    print(self.id)
+    return db.session.query(func.count(PrivateMessage.id)).filter_by(to_user_id=self.id, read=False).scalar()
+
 def filter_users(filters):
   or_filters = []
 

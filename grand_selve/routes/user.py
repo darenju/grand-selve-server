@@ -1,6 +1,9 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
+from sqlalchemy import or_, and_, func
 from datetime import datetime
 from werkzeug.security import generate_password_hash
+
+from .. import PrivateMessage
 from ..auth import login_required
 from ..models.user import User, UserRoleEnum, filter_users
 from ..extensions import db, parse_date, auto_cache, invalidate_cache
@@ -119,3 +122,140 @@ def edit_user(user_id):
   invalidate_cache(["get_users", f"get_user|user_id={user_id}", f"get_user_details|user_id={user_id}"])
 
   return jsonify(user.to_dict())
+
+
+def get_messages_with_user(user_id):
+  return PrivateMessage.query.filter(
+    and_(
+      or_(
+        PrivateMessage.to_user_id == g.current_user.id,
+        PrivateMessage.to_user_id == int(user_id),
+      ),
+      or_(
+        PrivateMessage.from_user_id == int(user_id),
+        PrivateMessage.from_user_id == g.current_user.id
+      ),
+      or_(
+        and_(
+          PrivateMessage.from_user_id == g.current_user.id,
+          PrivateMessage.deleted_sender == False
+        ),
+        and_(
+          PrivateMessage.to_user_id == g.current_user.id,
+          PrivateMessage.deleted_recipient == False
+        )
+      )
+    )
+  )
+
+def get_messages_from_user(user_id):
+  return PrivateMessage.query.filter(
+    PrivateMessage.from_user_id == g.current_user.id,
+    PrivateMessage.to_user_id == int(user_id),
+  )
+
+
+def get_messages_to_user(user_id):
+  return PrivateMessage.query.filter(
+    PrivateMessage.from_user_id == int(user_id),
+    PrivateMessage.to_user_id == g.current_user.id,
+  )
+
+@user_bp.route("/private_messages", methods=["GET"])
+@login_required()
+def get_private_messages():
+  private_messages = (
+    db.session.query(
+        PrivateMessage,
+        func.least(PrivateMessage.from_user_id, PrivateMessage.to_user_id).label("user1"),
+        func.greatest(PrivateMessage.from_user_id, PrivateMessage.to_user_id).label("user2"),
+    )
+    .filter(
+        or_(
+            and_(
+              PrivateMessage.to_user_id == g.current_user.id,
+              PrivateMessage.deleted_recipient == False,
+            ),
+            and_(
+              PrivateMessage.from_user_id == g.current_user.id,
+              PrivateMessage.deleted_sender == False,
+            ),
+        )
+    )
+    .order_by(
+        func.least(PrivateMessage.from_user_id, PrivateMessage.to_user_id),
+        func.greatest(PrivateMessage.from_user_id, PrivateMessage.to_user_id),
+        PrivateMessage.sent.desc()
+    )
+    .distinct(
+        func.least(PrivateMessage.from_user_id, PrivateMessage.to_user_id),
+        func.greatest(PrivateMessage.from_user_id, PrivateMessage.to_user_id),
+    )
+    .all()
+  )
+
+  return jsonify([pm[0].to_dict() for pm in private_messages])
+
+@user_bp.route("/private_messages/read/<user_id>", methods=["PUT"])
+@login_required()
+def mark_as_read(user_id):
+  read = request.get_json().get("read")
+
+  # Mark as unread for the sender.
+  last_msg_sender = get_messages_from_user(user_id).order_by(PrivateMessage.sent.desc()).first()
+
+  if last_msg_sender:
+    last_msg_sender.read_sender = read
+
+  # Mark as unread for the recipient.
+  last_msg_recipient = get_messages_to_user(user_id).order_by(PrivateMessage.sent.desc()).first()
+
+  if last_msg_recipient:
+    last_msg_recipient.read = read
+
+  db.session.commit()
+
+  return jsonify({ "message": "OK" })
+
+
+@user_bp.route("/private_messages/<user_id>", methods=["DELETE"])
+@login_required()
+def mark_as_deleted(user_id):
+  # Mark as undeleted for the sender.
+  get_messages_from_user(user_id).update({
+    "deleted_sender": True
+  })
+
+  # Mark as undeleted for the recipient.
+  msg_recipient = get_messages_to_user(user_id).update({
+    "deleted_recipient": True
+  })
+
+  db.session.commit()
+
+  return jsonify({ "message": "OK" })
+
+
+@user_bp.route("/private_messages/<user_id>", methods=["GET"])
+@login_required()
+def get_conversation(user_id):
+  messages = get_messages_with_user(user_id).order_by(PrivateMessage.sent.desc()).all()
+
+  return jsonify([m.to_dict() for m in messages])
+
+
+@user_bp.route("/private_messages/<user_id>", methods=["POST"])
+@login_required()
+def send_private_message(user_id):
+  message = request.get_json().get("message")
+
+  private_message = PrivateMessage(
+    content=message,
+    from_user_id=g.current_user.id,
+    to_user_id=user_id,
+  )
+
+  db.session.add(private_message)
+  db.session.commit()
+
+  return jsonify({ "message": "Message envoyé." })
