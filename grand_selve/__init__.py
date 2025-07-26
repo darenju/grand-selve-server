@@ -2,13 +2,13 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
-from flask_caching import Cache
 from .extensions import db, migrate, cache
 from .models import *
 from .routes.auth import auth_bp
 from .routes.contact_card import contact_card_bp
 from .routes.home import home_bp
 from .routes.member import member_bp
+from .routes.private_message import private_message_bp
 from .routes.profile import profile_bp
 from .routes.service import service_bp
 from .routes.user import user_bp
@@ -47,9 +47,10 @@ def create_app():
   app.register_blueprint(auth_bp)
   app.register_blueprint(contact_card_bp)
   app.register_blueprint(home_bp)
+  app.register_blueprint(private_message_bp)
   app.register_blueprint(profile_bp)
   app.register_blueprint(service_bp)
   app.register_blueprint(user_bp)
   app.register_blueprint(member_bp)
-  
+
   return app

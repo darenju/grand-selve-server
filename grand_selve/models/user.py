@@ -20,6 +20,7 @@ class User(db.Model):
   changed_first_password = db.Column(db.Boolean, nullable=False, default=False)
   first_name = db.Column(db.String(100), nullable=True, default="")
   last_name = db.Column(db.String(100), nullable=True, default="")
+  name = db.column_property(first_name + " " + last_name)
   gender = db.Column(db.String(6), nullable=True, default="")
   date_of_birth = db.Column(db.Date, nullable=True)
 
@@ -47,7 +48,7 @@ class User(db.Model):
       "changed_first_password": self.changed_first_password,
       "first_name": self.first_name,
       "last_name": self.last_name,
-      "name": self.first_name + " " + self.last_name,
+      "name": self.name,
       "gender": self.gender,
       "date_of_birth":  self.date_of_birth.strftime("%Y-%m-%d") if self.date_of_birth is not None else "",
       
@@ -85,5 +86,8 @@ def filter_users(filters):
   
   if "last_name" in filters or "*" in filters:
     or_filters.append(User.last_name.ilike(f'%{filters.get("last_name") or filters.get("*")}%'))
+
+  if filters.get("name") or filters.get("*"):
+    or_filters.append(User.name.ilike(f'%{filters.get("name") or filters.get("*")}%'))
 
   return db.session.query(User).filter(or_(*or_filters)).all()

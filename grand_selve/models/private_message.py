@@ -2,6 +2,8 @@ from datetime import datetime
 from ..extensions import db
 
 class PrivateMessage(db.Model):
+    __tablename__ = 'private_messages'
+
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     sent = db.Column(db.DateTime, default=datetime.now, nullable=False)
