@@ -7,6 +7,7 @@ from .models import *
 from .routes.auth import auth_bp
 from .routes.contact_card import contact_card_bp
 from .routes.home import home_bp
+from .routes.file import file_bp
 from .routes.member import member_bp
 from .routes.private_message import private_message_bp
 from .routes.profile import profile_bp
@@ -23,7 +24,8 @@ def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
   app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://grand_selve:{os.getenv("DATABASE_PASSWORD")}@localhost:5432/grand_selve"
-  app.config["UPLOAD_FOLDER"] = os.getenv("AVATAR_UPLOAD_FOLDER")
+  app.config["UPLOAD_FOLDER"] = os.getenv("UPLOAD_FOLDER")
+  app.config["AVATAR_UPLOAD_FOLDER"] = os.getenv("AVATAR_UPLOAD_FOLDER")
   app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 900        # 15 minutes
   app.config['JWT_REFRESH_TOKEN_EXPIRES'] = 604800     # 7 jours
 
@@ -47,6 +49,7 @@ def create_app():
   app.register_blueprint(auth_bp)
   app.register_blueprint(contact_card_bp)
   app.register_blueprint(home_bp)
+  app.register_blueprint(file_bp)
   app.register_blueprint(private_message_bp)
   app.register_blueprint(profile_bp)
   app.register_blueprint(service_bp)

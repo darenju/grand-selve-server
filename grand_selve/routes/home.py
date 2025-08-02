@@ -5,8 +5,17 @@ from ..models.service import Service, filter_services
 from ..models.member import Member, filter_members
 from ..extensions import db
 from ..auth import login_required
+from ..email import send_email
 
 home_bp = Blueprint('home', __name__, url_prefix='/')
+
+
+@home_bp.route("/test", methods=["GET"])
+def test():
+  send_email("darenju@live.com")
+
+  return jsonify({ "message": "OK" })
+
 
 @home_bp.route('/stats', methods=['GET'])
 @login_required()

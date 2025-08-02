@@ -44,3 +44,13 @@ def invalidate_cache(entries):
     for entry in entries:
         key = make_key(entry)
         cache.delete(key)
+
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+
+def get_extension(filename):
+    return filename.rsplit('.', 1)[1].lower()
+
+def allowed_file(filename):
+    return '.' in filename and get_extension(filename) in ALLOWED_EXTENSIONS

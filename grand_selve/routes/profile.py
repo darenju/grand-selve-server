@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 import jwt
 from ..models import User
-from ..extensions import db
+from ..extensions import db, allowed_file, get_extension
 from ..auth import login_required
 from .user import edit_user
 
@@ -31,16 +31,6 @@ def update_profile():
   return edit_user(int(user_id))
 
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-
-def get_extension(filename):
-    return filename.rsplit('.', 1)[1].lower()
-
-def allowed_file(filename):
-  return '.' in filename and get_extension(filename) in ALLOWED_EXTENSIONS
-
-
 @profile_bp.route("/avatar", methods=["POST"])
 @login_required()
 def upload_avatar():
@@ -51,7 +41,7 @@ def upload_avatar():
 
   if file and allowed_file(file.filename):
     filename = secure_filename(f"{uuid4().hex}.{get_extension(file.filename)}")
-    file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+    file.save(os.path.join(current_app.config["AVATAR_UPLOAD_FOLDER"], filename))
 
     user.avatar_path = filename
     db.session.commit()

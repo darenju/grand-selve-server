@@ -6,3 +6,4 @@ from .member import Member
 from .service_membership import Membership
 from .contact_card import ContactCard
 from .private_message import PrivateMessage
+from .stored_file import StoredFile
