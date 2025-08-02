@@ -23,9 +23,12 @@ def get_files():
     if request.args.get("service_id"):
         filters.append(StoredFile.service_id == int(request.args.get("service_id")))
 
-    files = StoredFile.query.filter(or_(*filters)).all()
+    files = db.paginate(db.select(StoredFile).filter(or_(*filters)))
 
-    return jsonify([f.to_dict() for f in files])
+    return {
+        "files": [m.to_dict() for m in files.items],
+        "pagination": list(files.iter_pages()),
+    }
 
 
 @file_bp.route("/<file_id>", methods=["GET"])
